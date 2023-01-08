@@ -36,7 +36,8 @@ def HartreeFock(molecule):
     list(range(0,molecule.n_electrons)), molecule.n_qubits)).transpose()
 
 
-    
+    with open('MolecularHamiltonians/MolecularHamiltonian' , 'wb') as myHandle:
+            pickle.dump(hamiltonian, myHandle, protocol=pickle.HIGHEST_PROTOCOL)
     
     return reference_ket, hamiltonian
 
@@ -150,7 +151,7 @@ def adapt_vqe(geometry,
                     parameters_res.insert(pos,0)
                         
                         
-       
+            print(max_derivative)                        
             
             ansatz_mat=ansatz_mat_res
             ansatz_ops=ansatz_ops_res
@@ -160,7 +161,14 @@ def adapt_vqe(geometry,
             options = min_options, method = 'BFGS', callback=trial_model.callback)
             
             parameters=list(opt_result['x'])
+            to_print=[]
+            for my_op in ansatz_ops:
+                for mat in range(len(Pool)):
+                    if (my_op==Pool[mat]):
+                        to_print.append(mat)
+                
             print(ansatz_ops)
+            print(to_print)
             
             curr_state = trial_model.prepare_state(parameters)
             curr_energy = trial_model.energy(parameters)
